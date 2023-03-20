@@ -9,21 +9,17 @@ prolog.consult('TopalaIonTezaProlog.pl')
 
 # create GUI
 root = Tk()
-root.geometry("700x350")
+root.geometry("1000x500")
 root.title("PySWIP Prolog Interaction")
-
-def to_camel_case(text):
-    s = text.replace("-", " ").replace("_", " ")
-    s = s.split()
-    if len(text) == 0:
-        return text
-    return s[0] + ''.join(i.capitalize() for i in s[1:])
 
 # define function to query Prolog and display results
 def query():
     input_text = str(medication_input.get()).lower()
+    query_medication_class(input_text)
+
+def query_medication_class(input_text):
     for result in prolog.query(f'medication_class({input_text}, MedicationClass)'):
-        results.insert(END, f'{input_text} is from class {result["MedicationClass"]}' + '\n')
+        results.insert(END, f'{input_text.title()} is from class {str(result["MedicationClass"]).title()}' + '\n')
 
 # create user interface elements
 medication_label = Label(root, text="Medication name:", font=('Arial 14'))
