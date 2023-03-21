@@ -7,17 +7,41 @@ prolog = Prolog()
 prolog.consult('TopalaIonTezaProlog.pl')
 
 
+class FullScreenApp(object):
+    def __init__(self, master, **kwargs):
+        self.master=master
+        pad=3
+        self._geom='200x200+0+0'
+        master.geometry("{0}x{1}+0+0".format(
+            master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
+        master.bind('<Escape>',self.toggle_geom)
+
+
 class MedicineApp:
     def __init__(self, master):
         self.master = master
         master.title("Medicine App")
+
+        pad=3
+        self._geom='200x200+0+0'
+        master.geometry("{0}x{1}+0+0".format(
+            master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
+        master.bind('<Escape>',self.toggle_geom)
 
         # Medication name input
         self.med_label = tk.Label(master, text="Enter medication name:", font=('Arial 12'))
         self.med_label.grid(row=0, column=0, padx=(75, 20), pady=20)
 
         self.med_entry = tk.Entry(master, font=('Arial 12'))
-        self.med_entry.grid(row=0, column=1, padx=(75, 20), pady=10)
+        self.med_entry.grid(row=0, column=1, padx=(10, 20), pady=10)
+
+        self.age = tk.Entry(master, font=('Arial 12'))
+        self.age.insert(0, 'Age')
+        self.age.grid(row=0, column=2, pady=10)
+
+        self.weight = tk.Entry(master, font=('Arial 12'))
+        self.weight.insert(0, 'Weight')
+        self.weight.grid(row=0, column=3, padx=(20, 20), pady=10)
 
         prologQueries = {
             1: "Show drug's medication class ",
@@ -26,6 +50,7 @@ class MedicineApp:
             4: "Is the drug a beta-blocker?",
             5: "Is it the drug safe for pregnancy?",
             6: "Medications for symptoms",
+            7: "Dosage recommendation (insert age and weight)",
         }
 
         self.selected_question = tk.IntVar()
@@ -38,15 +63,21 @@ class MedicineApp:
             self.radio_buttons.append(radio_button)
 
         self.answer_button = tk.Button(master, text="Show answer", font=('Arial 10'), command=self.show_answer)
-        self.answer_button.grid(row=7, column=0, padx=(75, 20), pady=10, sticky=tk.W)
+        self.answer_button.grid(row=8, column=0, padx=(75, 20), pady=10, sticky=tk.W)
 
         self.clear_button = tk.Button(master, text="Clear answer", font=('Arial 10'), command=self.clear_answer)
-        self.clear_button.grid(row=7, column=1, padx=(75, 20), pady=10, sticky=tk.W)
+        self.clear_button.grid(row=8, column=1, padx=(75, 20), pady=10, sticky=tk.W)
 
         self.results = tk.Text(root)
-        self.results.grid(row=8, column=0, columnspan=3, padx=(75, 20), sticky=tk.W)
+        self.results.grid(row=9, column=0, columnspan=3, padx=(75, 20), sticky=tk.W)
 
         self.answers = {}
+
+    def toggle_geom(self,event):
+        geom=self.master.winfo_geometry()
+        print(geom,self._geom)
+        self.master.geometry(self._geom)
+        self._geom=geom
 
     def show_answer(self):
         medication = str(self.med_entry.get()).lower()
@@ -119,6 +150,5 @@ class MedicineApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("1000x500")
     app = MedicineApp(root)
     app.run()
