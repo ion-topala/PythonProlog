@@ -12,6 +12,7 @@ medication(diphenhydramine, allergyRelief).
 % Define the medication class for each medication
 medication_class(aspirin, analgesics).
 medication_class(ibuprofen, analgesics).
+medication_class(ibuprofen, betaBlocker).
 medication_class(acetaminophen, analgesics).
 medication_class(lisinopril, antihypertensives).
 medication_class(amlodipine, antihypertensives).
