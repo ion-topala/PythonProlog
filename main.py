@@ -7,26 +7,16 @@ prolog = Prolog()
 prolog.consult('TopalaIonTezaProlog.pl')
 
 
-class FullScreenApp(object):
-    def __init__(self, master, **kwargs):
-        self.master=master
-        pad=3
-        self._geom='200x200+0+0'
-        master.geometry("{0}x{1}+0+0".format(
-            master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
-        master.bind('<Escape>',self.toggle_geom)
-
-
 class MedicineApp:
     def __init__(self, master):
         self.master = master
         master.title("Medicine App")
 
-        pad=3
-        self._geom='200x200+0+0'
+        pad = 3
+        self._geom = '200x200+0+0'
         master.geometry("{0}x{1}+0+0".format(
-            master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
-        master.bind('<Escape>',self.toggle_geom)
+            master.winfo_screenwidth() - pad, master.winfo_screenheight() - pad))
+        master.bind('<Escape>', self.toggle_geom)
 
         # Medication name input
         self.med_label = tk.Label(master, text="Enter medication name:", font=('Arial 12'))
@@ -73,11 +63,11 @@ class MedicineApp:
 
         self.answers = {}
 
-    def toggle_geom(self,event):
-        geom=self.master.winfo_geometry()
-        print(geom,self._geom)
+    def toggle_geom(self, event):
+        geom = self.master.winfo_geometry()
+        print(geom, self._geom)
         self.master.geometry(self._geom)
-        self._geom=geom
+        self._geom = geom
 
     def show_answer(self):
         medication = str(self.med_entry.get()).lower()
@@ -97,6 +87,10 @@ class MedicineApp:
             self.is_safe_for_pregnancy(medication)
         elif key == 6:
             self.medication_for_symptoms(medication)
+        elif key == 7:
+            age = int(self.age.get())
+            weight = int(self.weight.get())
+            self.dosage_recommendation(medication, age, weight)
 
     def query(self, value):
         input_text = value.lower()
@@ -139,6 +133,11 @@ class MedicineApp:
                 self.results.insert(END, 'Medication is safe for pregnancy' + '\n')
                 return
         self.results.insert(END, 'Medication is not safe for pregnancy' + '\n')
+
+    def dosage_recommendation(self, input_text, age, weight):
+        for result in prolog.query(f'dosage_recommendation({input_text}, {age}, {weight}, Dosage)'):
+            self.results.insert(END,
+                                f'{input_text.title()}\'s daily dosage is {str(result["Dosage"])} mg' + '\n')
 
     def clear_answer(self):
         # Clear answer label
