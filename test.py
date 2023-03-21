@@ -28,8 +28,8 @@ class MedicineApp:
             2: "Query drug's side effects",
             3: "What medicine interacts negative?",
             4: "Is the drug a beta-blocker?",
-            5: "For what disorders is contraindicated for?",
-            6: "Is it the drug safe for pregnancy?"
+            5: "Is it the drug safe for pregnancy?",
+            6: "Medications for symptoms",
         }
 
         # Radio buttons for selecting questions
@@ -62,7 +62,8 @@ class MedicineApp:
     def show_answer(self):
         # Get current medication name
         medication = str(self.med_entry.get()).lower()
-
+        if not medication:
+            return
         # Get selected question
         key = self.selected_question.get()
 
@@ -74,7 +75,10 @@ class MedicineApp:
             self.interacts_negative(medication)
         elif key == 4:
             self.is_beta_blocker(medication)
-
+        elif key == 5:
+            self.is_safe_for_pregnancy(medication)
+        elif key == 6:
+            self.medication_for_symptoms(medication)
         # Display question
         # self.question_label.config(text=question)
 
@@ -103,12 +107,28 @@ class MedicineApp:
             self.results.insert(END,
                                 f'{input_text.title()} interacts negative with {str(result["Medicine"]).title()}' + '\n')
 
+    def medication_for_symptoms(self, input_text):
+        for result in prolog.query(f'medication_for_symptom({input_text}, Symptom)'):
+            drugList = []
+            for drug in result['Symptom']:
+                drugList.append(str(drug).title())
+            drugMessage = ', '.join(drugList)
+            self.results.insert(END,
+                                f'For {input_text.lower()} you can use {drugMessage}' + '\n')
+
     def is_beta_blocker(self, input_text):
         for result in prolog.query(f'is_beta_blocker({input_text})'):
             if len(result) == 0:
                 self.results.insert(END, 'Medication is a beta blocker' + '\n')
                 return
         self.results.insert(END, 'Medication is not a beta blocker' + '\n')
+
+    def is_safe_for_pregnancy(self, input_text):
+        for result in prolog.query(f'safe_for_pregnancy({input_text})'):
+            if len(result) == 0:
+                self.results.insert(END, 'Medication is safe for pregnancy' + '\n')
+                return
+        self.results.insert(END, 'Medication is not safe for pregnancy' + '\n')
 
     def clear_answer(self):
         # Clear answer label
