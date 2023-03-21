@@ -23,9 +23,9 @@ class MedicineApp:
         self.med_entry.grid(row=0, column=1, padx=(75, 20), pady=10)
 
         # Predefined questions
-        questionsV2 = {
+        prologQueries = {
             1: "Show drug's medication class ",
-            2: "Another question"
+            2: "Query drug's side effects"
         }
         # self.questions = [
         #     "What is the dosage for this medication?",
@@ -37,8 +37,8 @@ class MedicineApp:
         # Radio buttons for selecting questions
         self.selected_question = tk.IntVar()
         self.radio_buttons = []
-        for i, question in enumerate(questionsV2):
-            radio_button = tk.Radiobutton(master, text=(questionsV2[question]), variable=self.selected_question,
+        for i, question in enumerate(prologQueries):
+            radio_button = tk.Radiobutton(master, text=(prologQueries[question]), variable=self.selected_question,
                                           font=('Arial 14'),
                                           value=question)
             radio_button.grid(row=i + 1, column=0, padx=(75, 20), pady=10, sticky=tk.W)
@@ -66,8 +66,12 @@ class MedicineApp:
         medication = self.med_entry.get()
 
         # Get selected question
-        question = self.selected_question.get()
-        self.query(medication)
+        key = self.selected_question.get()
+
+        if key == 1:
+            self.query_medication_class(medication)
+        elif key == 2:
+            self.query_side_effect(medication)
 
         # Display question
         # self.question_label.config(text=question)
@@ -86,6 +90,11 @@ class MedicineApp:
         for result in prolog.query(f'medication_class({input_text}, MedicationClass)'):
             self.results.insert(END,
                                 f'{input_text.title()} is from class {str(result["MedicationClass"]).title()}' + '\n')
+
+    def query_side_effect(self, input_text):
+        for result in prolog.query(f'side_effect({input_text}, SideEffect)'):
+            self.results.insert(END,
+                                f'{input_text.title()}\'s side effect is {str(result["SideEffect"]).title()}' + '\n')
 
     def clear_answer(self):
         # Clear answer label
